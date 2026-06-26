@@ -1,0 +1,395 @@
+{
+	"info": {
+		"name": "Medianet Remittances API",
+		"description": "Canonical Postman collection for ms-comp-remittances (REST gateway on localhost:8080).\n\nAll responses use ApiResponse: `{ \"code\", \"message\", \"data\" }`.\n\n**Usage:** run **Auth → Login (User — Jose Lema)** or **Login (Admin)** first; the test script saves `token` for subsequent requests.\n\nDemo credentials match README seed data.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "accountId",
+			"value": "11111111-1111-1111-1111-111111111111",
+			"description": "Jose Lema seed account (clientId 1)"
+		},
+		{
+			"key": "accountNumber",
+			"value": "",
+			"description": "Set from GET /accounts response after login"
+		},
+		{
+			"key": "movementId",
+			"value": "1"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login (User — Jose Lema)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const body = pm.response.json();",
+									"    if (body.data && body.data.token) {",
+									"        pm.collectionVariables.set('token', body.data.token);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"identification\": \"1710034065\",\n  \"password\": \"1234\"\n}"
+						},
+						"url": "{{baseUrl}}/auth/login",
+						"description": "Demo user (Jose Lema). Required before protected endpoints. Token path: `$.data.token`."
+					}
+				},
+				{
+					"name": "Login (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const body = pm.response.json();",
+									"    if (body.data && body.data.token) {",
+									"        pm.collectionVariables.set('token', body.data.token);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"identification\": \"1311322422\",\n  \"password\": \"admin123\"\n}"
+						},
+						"url": "{{baseUrl}}/auth/login",
+						"description": "Demo admin. Admins cannot POST /movements (deposits/withdrawals)."
+					}
+				},
+				{
+					"name": "Register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const body = pm.response.json();",
+									"    if (body.data && body.data.token) {",
+									"        pm.collectionVariables.set('token', body.data.token);",
+									"    }",
+									"}"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Maria Lopez\",\n  \"gender\": \"Femenino\",\n  \"age\": 40,\n  \"identification\": \"0912345678\",\n  \"address\": \"Calle Falsa 123\",\n  \"phone\": \"0991234567\",\n  \"password\": \"mypassword\",\n  \"accountType\": \"Ahorros\"\n}"
+						},
+						"url": "{{baseUrl}}/auth/register"
+					}
+				}
+			]
+		},
+		{
+			"name": "Clients",
+			"item": [
+				{
+					"name": "Create Client",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Maria Lopez\",\n  \"gender\": \"Femenino\",\n  \"age\": 40,\n  \"identification\": \"0912345678\",\n  \"address\": \"Calle Falsa 123\",\n  \"phone\": \"0991234567\",\n  \"password\": \"mypassword\",\n  \"status\": true\n}"
+						},
+						"url": "{{baseUrl}}/clients"
+					}
+				},
+				{
+					"name": "Get Client by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": "{{baseUrl}}/clients/1"
+					}
+				},
+				{
+					"name": "Get All Clients",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": "{{baseUrl}}/clients"
+					}
+				},
+				{
+					"name": "Update Client",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"clientId\": 1,\n  \"name\": \"Jose Lema Updated\",\n  \"gender\": \"Masculino\",\n  \"age\": 31,\n  \"identification\": \"1710034065\",\n  \"address\": \"Otavalo sn y principal modificado\",\n  \"phone\": \"098254785\",\n  \"password\": \"1234\",\n  \"status\": true\n}"
+						},
+						"url": "{{baseUrl}}/clients"
+					}
+				},
+				{
+					"name": "Delete Client",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": "{{baseUrl}}/clients/1"
+					}
+				},
+				{
+					"name": "Update Client Status (Inactivate/Activate)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": false\n}"
+						},
+						"url": "{{baseUrl}}/clients/1/status"
+					}
+				}
+			]
+		},
+		{
+			"name": "Accounts",
+			"item": [
+				{
+					"name": "Create Account",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"accountNumber\": \"987654\",\n  \"accountType\": \"Ahorro\",\n  \"initialBalance\": 1500.00,\n  \"status\": true,\n  \"clientId\": 1\n}"
+						},
+						"url": "{{baseUrl}}/accounts"
+					}
+				},
+				{
+					"name": "Get Account by Number",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": "{{baseUrl}}/accounts/{{accountNumber}}",
+						"description": "Set `accountNumber` from a GET /accounts response."
+					}
+				},
+				{
+					"name": "Get Accounts by Client ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": "{{baseUrl}}/accounts/client/1"
+					}
+				},
+				{
+					"name": "Get All Accounts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": "{{baseUrl}}/accounts"
+					}
+				},
+				{
+					"name": "Update Account",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"accountType\": \"Ahorro\",\n  \"status\": true,\n  \"clientId\": 1\n}"
+						},
+						"url": "{{baseUrl}}/accounts/{{accountNumber}}"
+					}
+				},
+				{
+					"name": "Delete Account",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": "{{baseUrl}}/accounts/{{accountNumber}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "Movements",
+			"item": [
+				{
+					"name": "Create Movement",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"accountId\": \"{{accountId}}\",\n  \"movementType\": \"DEPOSITO\",\n  \"value\": 500.0\n}"
+						},
+						"url": "{{baseUrl}}/movements",
+						"description": "Use a user token (not admin). Body uses `accountId` (UUID), not account number."
+					}
+				},
+				{
+					"name": "Get Movement by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": "{{baseUrl}}/movements/{{movementId}}"
+					}
+				},
+				{
+					"name": "Get Movements by Account Number",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": "{{baseUrl}}/movements/account/{{accountNumber}}"
+					}
+				},
+				{
+					"name": "Get Movements by Client ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": "{{baseUrl}}/movements/client/1"
+					}
+				},
+				{
+					"name": "Get All Movements",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": "{{baseUrl}}/movements"
+					}
+				},
+				{
+					"name": "Update Movement",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"movementType\": \"DEPOSITO\",\n  \"value\": 600.0\n}"
+						},
+						"url": "{{baseUrl}}/movements/{{movementId}}"
+					}
+				},
+				{
+					"name": "Delete Movement",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": "{{baseUrl}}/movements/{{movementId}}"
+					}
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Get Report",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{token}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/reports?fecha=2023-10-01,2023-10-31&cliente=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["reports"],
+							"query": [
+								{ "key": "fecha", "value": "2023-10-01,2023-10-31" },
+								{ "key": "cliente", "value": "1" }
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}

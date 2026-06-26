@@ -1,0 +1,87 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidenav [mode]="(isMobile$ | async) ? 'over' : 'side'" [opened]="!(isMobile$ | async)" class="sidenav">
+    <div class="sidenav-inner-wrapper">
+      <div class="logo-container" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2>Remittances App</h2>
+          <div class="subtitle">Institutional Portal</div>
+        </div>
+        <button mat-icon-button *ngIf="(isMobile$ | async)" (click)="closeSidenav(sidenav)">
+          <mat-icon style="color: var(--text-color-secondary);">close</mat-icon>
+        </button>
+      </div>
+      
+      <mat-nav-list class="sidebar-nav">
+        <a mat-list-item routerLink="/clientes" routerLinkActive="active-link" (click)="closeSidenav(sidenav)">
+          <div class="menu-item-content">
+            <mat-icon>people_outline</mat-icon> <span>Clientes</span>
+          </div>
+        </a>
+        <a mat-list-item routerLink="/cuentas" routerLinkActive="active-link" (click)="closeSidenav(sidenav)" *ngIf="user?.status !== false">
+          <div class="menu-item-content">
+            <mat-icon>account_balance_wallet</mat-icon> <span>Cuentas</span>
+          </div>
+        </a>
+        <a mat-list-item routerLink="/movimientos" routerLinkActive="active-link" (click)="closeSidenav(sidenav)" *ngIf="user?.status !== false">
+          <div class="menu-item-content">
+            <mat-icon>receipt_long</mat-icon> <span>Movimientos</span>
+          </div>
+        </a>
+      </mat-nav-list>
+
+      <div class="spacer"></div>
+
+      <!-- Quick Actions for Non-Admin Users -->
+      <div class="quick-actions" *ngIf="!isAdmin && user?.status !== false" style="padding: 0 16px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px;">
+        <button mat-raised-button color="accent" style="width: 100%; background-color: var(--primary-color); color: #000; font-weight: 600;" (click)="createMovement()">
+          <mat-icon>add</mat-icon> Nuevo Movimiento
+        </button>
+      </div>
+
+      <div class="user-profile-bottom">
+        <div class="user-badge" (click)="openProfile()" style="cursor: pointer;">
+          <div class="user-badge-avatar">
+            {{ (user?.username || 'U').substring(0, 2).toUpperCase() }}
+          </div>
+          <div class="user-badge-info">
+            <span class="user-badge-name">{{ user?.username | titlecase }}</span>
+            <span class="user-badge-email">{{ user?.username }}@remit.app</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="content-background">
+    <mat-toolbar color="primary" class="toolbar glass-panel-top">
+      <button mat-icon-button (click)="sidenav.toggle()" *ngIf="(isMobile$ | async)">
+        <mat-icon>menu</mat-icon>
+      </button>
+      
+      <div class="top-search" *ngIf="!(isMobile$ | async)">
+        <mat-icon>search</mat-icon>
+        <input type="text" placeholder="Search transactions...">
+      </div>
+
+      <span class="spacer"></span>
+      
+      <span class="welcome-text" *ngIf="!(isMobile$ | async)">Bienvenido, {{ user?.username | titlecase }} ({{ user?.role | uppercase }})</span>
+      
+      <button mat-icon-button (click)="toggleTheme()" matTooltip="Alternar Tema">
+        <mat-icon>{{ (isDarkTheme$ | async) ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+
+      <button mat-icon-button>
+        <mat-icon>notifications_none</mat-icon>
+      </button>
+
+      <button mat-icon-button *ngIf="(isMobile$ | async)" (click)="openProfile()">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <div class="main-content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

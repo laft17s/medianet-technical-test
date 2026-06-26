@@ -1,0 +1,8 @@
+# Copy this file to application-docker.properties and replace CHANGE_ME placeholders with real values.
+# Do not commit the real file (see .gitignore).
+
+# Docker Profile for ms-comp-remittances
+grpc.client.client-service.address=static://ms-core-client-person:9091
+grpc.client.account-service.address=static://ms-core-account-movement:9093
+grpc.client.movement-service.address=static://ms-core-account-movement:9093
+spring.kafka.bootstrap-servers=kafka:29092

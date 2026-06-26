@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package com.laft.movement.grpc;
+
+option java_multiple_files = true;
+option java_package = "com.laft.commons.grpc.movement";
+
+service MovementServiceGrpc {
+    rpc CreateMovement (MovementRequest) returns (MovementResponse);
+    rpc GetMovementById (GetMovementByIdRequest) returns (MovementResponse);
+    rpc UpdateMovement (UpdateMovementRequest) returns (MovementResponse);
+    rpc DeleteMovement (DeleteMovementRequest) returns (DeleteMovementResponse);
+    rpc GetMovementsByAccount (GetMovementsByAccountRequest) returns (MovementListResponse);
+    rpc GenerateReport (ReportRequest) returns (ReportResponse);
+    rpc GetAllMovements (EmptyMovementRequest) returns (MovementListResponse);
+}
+
+message MovementRequest {
+    string accountNumber = 1;
+    string movementType = 2;
+    double value = 3;
+}
+
+message MovementResponse {
+    int64 movementId = 1;
+    string date = 2;
+    string movementType = 3;
+    double value = 4;
+    double balance = 5;
+    string accountNumber = 6;
+    string clientName = 7;
+    string accountType = 8;
+}
+
+message GetMovementsByAccountRequest {
+    string accountNumber = 1;
+}
+
+message GetMovementByIdRequest {
+    int64 movementId = 1;
+}
+
+message UpdateMovementRequest {
+    int64 movementId = 1;
+    string movementType = 2;
+    double value = 3;
+}
+
+message DeleteMovementRequest {
+    int64 movementId = 1;
+}
+
+message DeleteMovementResponse {
+    bool success = 1;
+}
+
+message MovementListResponse {
+    repeated MovementResponse movements = 1;
+}
+
+message ReportRequest {
+    int64 clientId = 1;
+    string startDate = 2;
+    string endDate = 3;
+}
+
+message ReportItem {
+    string date = 1;
+    string clientName = 2;
+    string accountNumber = 3;
+    string accountType = 4;
+    double initialBalance = 5;
+    bool status = 6;
+    double movementValue = 7;
+    double availableBalance = 8;
+}
+
+message EmptyMovementRequest {}
+
+message ReportResponse {
+    repeated ReportItem items = 1;
+}

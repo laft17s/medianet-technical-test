@@ -1,0 +1,79 @@
+# =============================================================================
+# Build artifacts
+# =============================================================================
+**/target/
+*.class
+
+# Node / Angular
+node_modules/
+.angular/cache
+frontend/app-remittance/dist/
+
+# =============================================================================
+# Secrets & local configuration (templates and examples ARE tracked)
+# =============================================================================
+.env
+!.env.example
+
+# Spring Boot config with secrets
+**/application.properties
+**/application-docker.properties
+!**/*.template
+!**/application-test.properties
+
+# Docker Compose (template is tracked; local copy is generated from it)
+/docker-compose.yml
+/docker-compose-apps.yml
+!docker-compose.yml.template
+
+# Angular environment files (templates are tracked)
+frontend/app-remittance/src/environments/environment.ts
+frontend/app-remittance/src/environments/environment.prod.ts
+!frontend/app-remittance/src/environments/*.template
+
+# JMeter binary installs (plan + docs/jmeter/ ARE tracked)
+/jmeter/
+tools/apache-jmeter-*/
+docs/jmeter/results.jtl
+docs/jmeter/report/
+jmeter.log
+
+# =============================================================================
+# Local / scratch files (not part of the deliverable)
+# =============================================================================
+scratch_prompts.txt
+extract.py
+test_api.sh
+test_api*.sh
+start-docker.sh
+start-local.sh
+.agents/
+
+# Legacy duplicate Postman export (canonical: postman_collection.json)
+medianet-postman-collection.json
+
+# Internal requirement PDFs and scratch assets
+Prueba Tecnica*.pdf
+Untitled-*.svg
+
+# =============================================================================
+# IDE & OS
+# =============================================================================
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# =============================================================================
+# Logs
+# =============================================================================
+*.log
+
+# =============================================================================
+# AI agent tooling (prompts/decisions tracked; dependencies ignored)
+# =============================================================================
+ai/**/node_modules

@@ -1,0 +1,25 @@
+# Copy this file to application.properties and replace CHANGE_ME placeholders with real values.
+# Do not commit the real file (see .gitignore).
+
+spring.application.name=ms-core-client-person
+server.port=8081
+
+# gRPC server port
+grpc.server.port=9091
+
+# Datasource inherited from client-repository configuration
+spring.datasource.url=jdbc:postgresql://localhost:5432/core_banking?currentSchema=db-clients
+spring.datasource.username=admin
+spring.datasource.password=CHANGE_ME
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+spring.main.allow-bean-definition-overriding=true
+
+# Admin Seeder Configuration
+app.admin.name=System Administrator
+app.admin.gender=N/A
+app.admin.age=99
+app.admin.identification=1311322422
+app.admin.address=Headquarters
+app.admin.phone=0999999999
+app.admin.password=CHANGE_ME

@@ -1,0 +1,32 @@
+.dialog-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding-top: 8px;
+}
+
+.w-100-col {
+  grid-column: 1 / -1;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text-color);
+  font-size: 0.875rem;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .dialog-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

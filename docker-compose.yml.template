@@ -1,0 +1,212 @@
+# Copy this file to docker-compose.yml and configure credentials (see .env.example).
+# deploy.sh uses docker-compose.yml in the project root — create it before running deploy.
+# Do not commit the real file (see .gitignore).
+
+version: '3.8'
+
+# =============================================================================
+# Medianet Core Banking - Docker Compose (Unified)
+# =============================================================================
+# Infrastructure: PostgreSQL, Zookeeper, Kafka, Kafka Connect
+# Applications:   ms-core-client-person, ms-core-account-movement,
+#                 ms-comp-remittances, app-remittance (Angular)
+# =============================================================================
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # INFRASTRUCTURE
+  # ---------------------------------------------------------------------------
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-CHANGE_ME}
+      POSTGRES_DB: ${POSTGRES_DB:-core_banking}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/BaseDatos.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - banking-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-core_banking}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      KAFKA_HEAP_OPTS: "-Xmx256m -Xms128m"
+    ports:
+      - "2181:2181"
+    networks:
+      - banking-network
+    healthcheck:
+      test: ["CMD", "echo", "ruok", "|", "nc", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_HEAP_OPTS: "-Xmx256m -Xms128m"
+    networks:
+      - banking-network
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  kafka-connect:
+    image: confluentinc/cp-kafka-connect:7.4.0
+    container_name: kafka-connect
+    depends_on:
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8083:8083"
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: "kafka:29092"
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect"
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      KAFKA_HEAP_OPTS: "-Xmx256m -Xms128m"
+    networks:
+      - banking-network
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # BACKEND MICROSERVICES
+  # ---------------------------------------------------------------------------
+
+  ms-core-client-person:
+    build:
+      context: ./backend/microservices/ms-core-client-person
+    container_name: ms-core-client-person
+    ports:
+      - "8081:8081"
+      - "9091:9091"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - JAVA_TOOL_OPTIONS=-Xmx256m
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - banking-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  ms-core-account-movement:
+    build:
+      context: ./backend/microservices/ms-core-account-movement
+    container_name: ms-core-account-movement
+    ports:
+      - "8082:8082"
+      - "9093:9093"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - JAVA_TOOL_OPTIONS=-Xmx256m
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - banking-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  ms-comp-remittances:
+    build:
+      context: ./backend/composite/ms-comp-remittances
+    container_name: ms-comp-remittances
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - JAVA_TOOL_OPTIONS=-Xmx256m
+    depends_on:
+      ms-core-client-person:
+        condition: service_healthy
+      ms-core-account-movement:
+        condition: service_healthy
+    networks:
+      - banking-network
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # FRONTEND
+  # ---------------------------------------------------------------------------
+
+  app-remittance:
+    build:
+      context: ./frontend/app-remittance
+    container_name: app-remittance
+    ports:
+      - "4200:80"
+    depends_on:
+      ms-comp-remittances:
+        condition: service_healthy
+    networks:
+      - banking-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  banking-network:
+    driver: bridge

@@ -1,0 +1,32 @@
+# Copy this file to application.properties and replace CHANGE_ME placeholders with real values.
+# Do not commit the real file (see .gitignore).
+
+spring.application.name=ms-core-account-movement
+server.port=8082
+
+# gRPC server port
+grpc.server.port=9093
+
+# Account Datasource Configuration
+spring.datasource.url=jdbc:postgresql://localhost:5432/core_banking?currentSchema=db-accounts
+spring.datasource.username=admin
+spring.datasource.password=CHANGE_ME
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.datasource.account.jdbc-url=jdbc:postgresql://localhost:5432/core_banking?currentSchema=db-accounts
+spring.datasource.account.username=admin
+spring.datasource.account.password=CHANGE_ME
+spring.datasource.account.driver-class-name=org.postgresql.Driver
+
+# Movement Datasource Configuration
+spring.datasource.movement.jdbc-url=jdbc:postgresql://localhost:5432/core_banking?currentSchema=db-movements
+spring.datasource.movement.username=admin
+spring.datasource.movement.password=CHANGE_ME
+spring.datasource.movement.driver-class-name=org.postgresql.Driver
+
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+
+# Kafka properties
+spring.kafka.bootstrap-servers=localhost:9092
+spring.main.allow-bean-definition-overriding=true

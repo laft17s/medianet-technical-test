@@ -1,0 +1,2 @@
+CREATE SCHEMA IF NOT EXISTS "db-accounts";
+CREATE SCHEMA IF NOT EXISTS "db-movements";

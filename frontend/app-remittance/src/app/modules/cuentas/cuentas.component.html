@@ -1,0 +1,125 @@
+<div class="page-header">
+  <div class="title">
+    <h1>Gestión de Cuentas</h1>
+    <p>{{ isAdmin ? 'Supervise y administre las carteras de clientes, tipos de cuentas y saldos operativos de la plataforma.' : 'Mis Cuentas' }}</p>
+  </div>
+  <button mat-raised-button color="accent" style="background-color: var(--secondary-color); color: white;" class="mobile-fixed-bottom-btn" [class.shrink]="isScrollingDown" (click)="createAccount()">
+    <mat-icon>add</mat-icon> <span class="btn-text">Nueva Cuenta</span>
+  </button>
+</div>
+
+<!-- KPI Widgets -->
+<div *ngIf="isAdmin && !isLoading" class="kpi-container" style="display: flex; gap: 1rem; margin-bottom: 24px; flex-wrap: wrap;">
+  <div class="glass-card" style="flex: 1; min-width: 250px; padding: 1rem;">
+    <div style="font-size: 0.75rem; color: var(--text-color-secondary); text-transform: uppercase; margin-bottom: 8px;">Total Cuentas</div>
+    <div style="font-family: 'Hanken Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">
+      {{ totalAccounts | number }}
+    </div>
+  </div>
+  <div class="glass-card" style="flex: 1; min-width: 250px; padding: 1rem;">
+    <div style="font-size: 0.75rem; color: var(--text-color-secondary); text-transform: uppercase; margin-bottom: 8px;">Saldo Total (USD)</div>
+    <div style="font-family: 'Hanken Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--secondary-color);">
+      {{ totalBalance | currency }}
+    </div>
+  </div>
+  <div class="glass-card" style="flex: 1; min-width: 250px; padding: 1rem;">
+    <div style="font-size: 0.75rem; color: var(--text-color-secondary); text-transform: uppercase; margin-bottom: 8px;">Tasa de Activación</div>
+    <div style="font-family: 'Hanken Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">
+      {{ activationRate | number:'1.1-1' }}%
+    </div>
+  </div>
+</div>
+
+<div class="glass-card table-container">
+
+  <!-- SKELETON LOADER -->
+  <table *ngIf="isLoading" class="premium-table" style="width: 100%;">
+    <thead>
+      <tr>
+        <th *ngFor="let c of [1,2,3,4,5,6]"><div class="skeleton-box" style="height: 15px; width: 60%;"></div></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of [1,2,3,4,5]">
+        <td *ngFor="let c of [1,2,3,4,5,6]"><div class="skeleton-box" style="height: 20px;"></div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ACTUAL TABLE -->
+  <table *ngIf="!isLoading" mat-table [dataSource]="accounts" class="mat-elevation-z0 premium-table">
+    <ng-container matColumnDef="accountId">
+      <th mat-header-cell *matHeaderCellDef> No. </th>
+      <td mat-cell *matCellDef="let element; let i = index"> {{i + 1}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="clientName">
+      <th mat-header-cell *matHeaderCellDef> Cliente </th>
+      <td mat-cell *matCellDef="let element">
+        <span class="client-avatar">{{ (element.clientName || element.clientname || 'N A').substring(0, 2).toUpperCase() }}</span>
+        {{element.clientName || element.clientname || 'N/A'}} 
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="accountNumber">
+      <th mat-header-cell *matHeaderCellDef> Número Cuenta </th>
+      <td mat-cell *matCellDef="let element"> {{ maskAccount(element.accountNumber || element.accountnumber) }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="accountType">
+      <th mat-header-cell *matHeaderCellDef> Tipo </th>
+      <td mat-cell *matCellDef="let element"> {{element.accountType || element.accounttype}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="initialBalance">
+      <th mat-header-cell *matHeaderCellDef> Saldo </th>
+      <td mat-cell *matCellDef="let element" class="financial-value" [ngClass]="((element.initialBalance !== undefined ? element.initialBalance : element.initialbalance) > 0) ? 'text-success' : ''"> 
+        {{(element.initialBalance !== undefined ? element.initialBalance : element.initialbalance) | currency}} 
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef> Estado </th>
+      <td mat-cell *matCellDef="let element"> 
+        <span class="badge" [ngClass]="element.status ? 'bg-success' : 'bg-danger'">
+          {{element.status ? 'Activa' : 'Inactiva'}}
+        </span>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <!-- MOBILE CARDS -->
+  <div *ngIf="!isLoading" class="mobile-cards-container">
+    <div *ngFor="let acc of accounts; let i = index" class="mobile-card">
+      <div class="mobile-card-header">
+        <div class="mobile-card-title">
+          <span class="client-avatar">{{ (acc.clientName || 'N A').substring(0, 2).toUpperCase() }}</span>
+          {{ acc.clientName || 'N/A' }}
+        </div>
+        <div class="mobile-card-subtitle">Cuenta # {{ maskAccount(acc.accountNumber) }}</div>
+      </div>
+      <div class="mobile-card-body">
+        <div class="mobile-card-row">
+          <span class="mobile-card-label">Tipo</span>
+          <span class="mobile-card-value">{{ acc.accountType || 'N/A' }}</span>
+        </div>
+        <div class="mobile-card-row">
+          <span class="mobile-card-label">Estado</span>
+          <span class="badge" [ngClass]="acc.status ? 'bg-success' : 'bg-danger'">{{ acc.status ? 'Activa' : 'Inactiva' }}</span>
+        </div>
+        <div class="mobile-card-row mt-2">
+          <span class="mobile-card-label">Saldo</span>
+          <span class="mobile-card-value financial-value text-success">
+            {{ acc.initialBalance | currency }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="p-4 text-center" *ngIf="accounts.length === 0 && !isLoading">
+    <p>No se encontraron cuentas.</p>
+  </div>
+</div>

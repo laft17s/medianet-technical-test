@@ -1,0 +1,5 @@
+# Copy this file to application-docker.properties and replace CHANGE_ME placeholders with real values.
+# Do not commit the real file (see .gitignore).
+
+# Docker Profile for ms-core-client-person
+spring.datasource.url=jdbc:postgresql://postgres:5432/core_banking?currentSchema=db-clients

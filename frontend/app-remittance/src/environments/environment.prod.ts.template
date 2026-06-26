@@ -1,0 +1,7 @@
+// Copy this file to environment.prod.ts and adjust values for your environment.
+// Do not commit the real file (see .gitignore).
+
+export const environment = {
+  production: true,
+  apiUrl: 'http://localhost:8080'
+};

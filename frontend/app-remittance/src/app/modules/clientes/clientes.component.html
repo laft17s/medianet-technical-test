@@ -1,0 +1,256 @@
+<div class="page-header">
+  <div class="title">
+    <h1>Gestión de Clientes</h1>
+    <p>Administra los clientes de la plataforma</p>
+  </div>
+  <button *ngIf="isAdmin" mat-raised-button color="accent" (click)="createClient()" class="mobile-fixed-bottom-btn" [class.shrink]="isScrollingDown">
+    <mat-icon>add</mat-icon> <span class="btn-text">Nuevo Cliente</span>
+  </button>
+</div>
+
+<div *ngIf="isAdmin" class="glass-card table-container">
+
+  <!-- SKELETON LOADER -->
+  <table *ngIf="isLoading" class="premium-table" style="width: 100%;">
+    <thead>
+      <tr>
+        <th *ngFor="let c of [1,2,3,4,5]"><div class="skeleton-box" style="height: 15px; width: 60%;"></div></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of [1,2,3,4,5]">
+        <td *ngFor="let c of [1,2,3,4,5]"><div class="skeleton-box" style="height: 20px;"></div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ACTUAL TABLE -->
+  <table *ngIf="!isLoading" mat-table [dataSource]="clients" class="mat-elevation-z0 premium-table">
+    <!-- ID Column -->
+    <ng-container matColumnDef="clientId">
+      <th mat-header-cell *matHeaderCellDef> No. </th>
+      <td mat-cell *matCellDef="let element; let i = index"> {{i + 1}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Nombre </th>
+      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+
+    <!-- Identification Column -->
+    <ng-container matColumnDef="identification">
+      <th mat-header-cell *matHeaderCellDef> Identificación </th>
+      <td mat-cell *matCellDef="let element"> {{element.identification}} </td>
+    </ng-container>
+
+    <!-- Status Column -->
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef> Estado </th>
+      <td mat-cell *matCellDef="let element"> 
+        <span class="badge" [ngClass]="element.status ? 'bg-success' : 'bg-danger'">
+          {{element.status ? 'Activo' : 'Inactivo'}}
+        </span>
+      </td>
+    </ng-container>
+
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef> Acciones </th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-icon-button color="primary" (click)="editClient(element)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteClient(element.clientId)" *ngIf="element.status" matTooltip="Inactivar">
+          <mat-icon>delete</mat-icon>
+        </button>
+        <button mat-icon-button color="accent" (click)="reactivateClient(element.clientId)" *ngIf="!element.status" matTooltip="Reactivar">
+          <mat-icon>restore</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <!-- MOBILE CARDS -->
+  <div *ngIf="!isLoading" class="mobile-cards-container">
+    <div *ngFor="let client of clients; let i = index" class="mobile-card">
+      <div class="mobile-card-header">
+        <div class="mobile-card-title">
+          <span class="client-avatar">{{ (client.name || 'U').substring(0, 2).toUpperCase() }}</span>
+          {{ client.name }}
+        </div>
+      </div>
+      <div class="mobile-card-body">
+        <div class="mobile-card-row">
+          <span class="mobile-card-label">Identificación</span>
+          <span class="mobile-card-value">{{ client.identification }}</span>
+        </div>
+        <div class="mobile-card-row">
+          <span class="mobile-card-label">Estado</span>
+          <span class="badge" [ngClass]="client.status ? 'bg-success' : 'bg-danger'">{{ client.status ? 'Activo' : 'Inactivo' }}</span>
+        </div>
+        <div class="mobile-card-actions">
+          <button mat-icon-button color="primary" (click)="editClient(client)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteClient(client.clientId!)" *ngIf="client.status" matTooltip="Inactivar">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <button mat-icon-button color="accent" (click)="reactivateClient(client.clientId!)" *ngIf="!client.status" matTooltip="Reactivar">
+            <mat-icon>restore</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!isAdmin && !isLoading" class="profile-dashboard">
+  
+  <div class="profile-card glass-card">
+    <div class="profile-header">
+      <div class="avatar-large">
+        <img *ngIf="false; else noAvatar" src="" alt="Avatar">
+        <ng-template #noAvatar>
+          <div class="avatar-placeholder">{{ (myProfile?.name || 'U').substring(0, 2).toUpperCase() }}</div>
+          <div class="online-dot"></div>
+        </ng-template>
+      </div>
+      <div class="profile-titles">
+        <h2>{{ myProfile?.name }}</h2>
+        <span class="client-id">Cliente # {{ myProfile?.clientId }}</span>
+      </div>
+    </div>
+    
+    <div class="profile-details">
+      <div class="detail-row">
+        <span>IDENTIFICACIÓN</span>
+        <strong>{{ myProfile?.identification }}</strong>
+      </div>
+      <div class="detail-row">
+        <span>EDAD</span>
+        <strong>{{ myProfile?.age }}</strong>
+      </div>
+      <div class="detail-row">
+        <span>GÉNERO</span>
+        <strong>{{ myProfile?.gender }}</strong>
+      </div>
+      <div class="detail-row">
+        <span>ESTADO</span>
+        <span class="badge" [ngClass]="myProfile?.status ? 'bg-success' : 'bg-danger'">
+          {{ myProfile?.status ? 'ACTIVO' : 'INACTIVO' }}
+        </span>
+      </div>
+    </div>
+    
+    <div class="inactive-alert" *ngIf="!myProfile?.status" style="margin-top: 16px; padding: 12px; border-radius: 8px; background-color: rgba(255, 50, 50, 0.1); border: 1px solid rgba(255, 50, 50, 0.3); color: #ff5252; display: flex; align-items: center; gap: 8px;">
+      <mat-icon>warning</mat-icon>
+      <span style="font-size: 14px; font-weight: 500;">Su cuenta se encuentra inactiva. No puede registrar cuentas ni realizar movimientos. Por favor contacte al administrador.</span>
+    </div>
+
+    <div class="profile-actions" style="margin-bottom: 24px;">
+      <button mat-raised-button color="accent" class="btn-cyan desktop-only-btn" (click)="editClient(myProfile!)" style="width: 100%;">
+        <mat-icon>edit</mat-icon> <span class="btn-text">Editar Perfil</span>
+      </button>
+      <button mat-icon-button class="btn-more">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+    </div>
+
+    <div class="kyc-badge mt-4">
+      <mat-icon class="kyc-icon">verified_user</mat-icon>
+      <div class="kyc-text">
+        <strong>Nivel 3 Verificado</strong>
+        <span>Documentación actualizada</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING BUTTON FOR MOBILE OUTSIDE GLASS-CARD -->
+  <button mat-raised-button color="accent" class="btn-cyan mobile-fixed-bottom-btn mobile-only-btn" [class.shrink]="isScrollingDown" (click)="editClient(myProfile!)">
+    <mat-icon>edit</mat-icon> <span class="btn-text">Editar Perfil</span>
+  </button>
+
+  <div class="dashboard-right">
+    
+    <div class="summary-card glass-card">
+      <div class="summary-header">
+        <span class="title">RESUMEN DE CUENTA</span>
+        <mat-icon>account_balance_wallet</mat-icon>
+      </div>
+      <div class="summary-balance">
+        <span class="currency">$</span>
+        <span class="amount">{{ totalBalance | number:'1.2-2' }}</span>
+        <span class="currency">USD</span>
+      </div>
+      <div class="summary-metrics">
+        <div class="metric">
+          <span class="label">LÍMITE MENSUAL</span>
+          <strong class="value">$50k</strong>
+        </div>
+        <div class="metric">
+          <span class="label">REMITIDO (MTD)</span>
+          <strong class="value">$8.4k</strong>
+        </div>
+        <div class="metric">
+          <span class="label">SCORE RIESGO</span>
+          <strong class="value text-success">BAJO</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="movements-card glass-card">
+      <div class="movements-header">
+        <span class="title">MOVIMIENTOS RECIENTES</span>
+        <a routerLink="/movimientos" class="link-cyan">Ver todos</a>
+      </div>
+      
+      <table class="premium-table movements-table" style="width: 100%;">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Referencia</th>
+            <th>Transacción</th>
+            <th style="text-align: right;">Monto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let mov of recentMovements">
+            <td>{{ mov.date | date:'dd MMM yy' }}</td>
+            <td>TXN-{{ mov.movementId }}</td>
+            <td>{{ mov.movementType || mov.movementtype }}</td>
+            <td style="text-align: right;" class="financial-value" [ngClass]="mov.value > 0 ? 'text-success' : 'text-danger'">
+              {{ mov.value > 0 ? '+' : '' }}${{ mov.value | number:'1.2-2' }}
+            </td>
+          </tr>
+          <tr *ngIf="recentMovements.length === 0">
+            <td colspan="4" class="text-center p-4">No hay movimientos recientes</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- MOBILE CARDS FOR RECENT MOVEMENTS -->
+      <div class="mobile-cards-container" *ngIf="recentMovements.length > 0">
+        <div *ngFor="let mov of recentMovements" class="mobile-card" style="padding: 15px; margin-bottom: 10px; border-radius: 8px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+            <span style="font-size: 12px; color: #a0a0a0; word-break: break-word;">{{ mov.date | date:'dd MMM yy' }} (TXN-{{ mov.movementId }})</span>
+            <span class="badge" [ngClass]="mov.value > 0 ? 'bg-success' : 'bg-danger'" style="font-size: 10px; max-width: 100%; white-space: normal; text-align: center;">{{ mov.movementType || mov.movementtype }}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 14px; font-weight: 500;">Monto</span>
+            <strong class="financial-value" [ngClass]="mov.value > 0 ? 'text-success' : 'text-danger'">
+              {{ mov.value > 0 ? '+' : '' }}${{ mov.value | number:'1.2-2' }}
+            </strong>
+          </div>
+        </div>
+      </div>
+      <div class="mobile-cards-container" *ngIf="recentMovements.length === 0">
+        <div class="text-center p-4" style="color: #a0a0a0;">No hay movimientos recientes</div>
+      </div>
+    </div>
+    
+  </div>
+</div>

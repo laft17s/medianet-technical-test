@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package com.laft.account.grpc;
+
+option java_multiple_files = true;
+option java_package = "com.laft.commons.grpc.account";
+
+service AccountServiceGrpc {
+    rpc CreateAccount (AccountRequest) returns (AccountResponse);
+    rpc GetAccount (GetAccountRequest) returns (AccountResponse);
+    rpc GetAccountById (GetAccountByIdRequest) returns (AccountResponse);
+    rpc UpdateAccount (AccountRequest) returns (AccountResponse);
+    rpc DeleteAccount (DeleteAccountRequest) returns (DeleteAccountResponse);
+    rpc GetAccountsByClient (GetAccountsByClientRequest) returns (AccountListResponse);
+    rpc GetAllAccounts (EmptyAccountRequest) returns (AccountListResponse);
+}
+
+message AccountRequest {
+    string accountNumber = 1;
+    string accountType = 2;
+    double initialBalance = 3;
+    bool status = 4;
+    int64 clientId = 5;
+    string accountId = 7;
+}
+
+message AccountResponse {
+    string accountNumber = 1;
+    string accountType = 2;
+    double initialBalance = 3;
+    bool status = 4;
+    int64 clientId = 5;
+    string clientName = 6;
+    string accountId = 7;
+}
+
+message GetAccountRequest {
+    string accountNumber = 1;
+}
+
+message GetAccountByIdRequest {
+    string accountId = 1;
+}
+
+message DeleteAccountRequest {
+    string accountNumber = 1;
+}
+
+message DeleteAccountResponse {
+    bool success = 1;
+}
+
+message GetAccountsByClientRequest {
+    int64 clientId = 1;
+}
+
+message AccountListResponse {
+    repeated AccountResponse accounts = 1;
+}
+
+message EmptyAccountRequest {}

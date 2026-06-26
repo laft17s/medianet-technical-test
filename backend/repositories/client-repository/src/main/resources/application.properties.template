@@ -1,0 +1,9 @@
+# Copy this file to application.properties and replace CHANGE_ME placeholders with real values.
+# Do not commit the real file (see .gitignore).
+
+spring.application.name=client-repository
+spring.datasource.url=jdbc:postgresql://localhost:5432/core_banking?currentSchema="db-clients"
+spring.datasource.username=admin
+spring.datasource.password=CHANGE_ME
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true

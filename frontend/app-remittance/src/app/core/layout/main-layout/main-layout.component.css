@@ -1,0 +1,206 @@
+.sidenav-container {
+  height: 100vh;
+}
+
+.sidenav {
+  width: 280px;
+  background-color: #0B1115 !important; /* Stitch sidebar very dark color */
+  border-right: none !important;
+}
+
+::ng-deep .sidenav .mat-drawer-inner-container {
+  overflow-x: hidden !important;
+}
+
+::ng-deep .mat-drawer-backdrop.mat-drawer-shown {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+.sidenav-inner-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.logo-container {
+  padding: 32px 24px;
+  text-align: left;
+}
+
+.logo-container h2 {
+  margin: 0;
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: 1.25rem;
+  letter-spacing: -0.5px;
+}
+.logo-container .subtitle {
+  font-size: 0.65rem;
+  color: var(--text-color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.content-background {
+  background-color: var(--bg-color); /* Matches the main dark background */
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.welcome-text {
+  font-size: 14px;
+  margin-right: 15px;
+  color: #fff;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.glass-panel-top {
+  background-color: transparent !important;
+  border-bottom: none !important;
+  color: var(--text-color) !important;
+  box-shadow: none;
+}
+
+.sidebar-nav {
+  flex-grow: 1;
+  padding-top: 0 !important;
+}
+
+mat-nav-list a {
+  color: var(--text-color-secondary);
+  margin: 0;
+  border-radius: 0;
+  padding: 0 24px !important;
+  height: 56px;
+  display: flex !important;
+  align-items: center !important;
+  transition: all 0.2s ease-in-out;
+  border-left: 4px solid transparent;
+}
+
+mat-nav-list a:hover {
+  background-color: rgba(255,255,255,0.05);
+  color: var(--text-color);
+}
+
+mat-nav-list a mat-icon {
+  margin-right: 12px;
+  color: var(--text-color-secondary);
+}
+
+.menu-item-content {
+  display: flex !important;
+  align-items: center !important;
+  width: 100%;
+}
+
+::ng-deep mat-nav-list a .mdc-list-item__content {
+  display: flex !important;
+  align-items: center !important;
+  width: 100%;
+}
+
+.active-link {
+  background-color: rgba(0, 245, 255, 0.05) !important; /* Slight cyan tint */
+  color: var(--text-color) !important;
+  font-weight: 600;
+  border-left: 4px solid var(--primary-color); /* Cyan border on left */
+}
+
+.active-link mat-icon {
+  color: var(--primary-color) !important;
+}
+
+/* Search Box inside toolbar */
+.top-search {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  padding: 0 16px;
+  border-radius: 8px;
+  width: 300px;
+}
+.top-search mat-icon {
+  color: var(--text-color-secondary);
+  font-size: 20px;
+}
+.top-search input {
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  padding: 8px;
+  outline: none;
+  width: 100%;
+}
+.top-search input::placeholder {
+  color: var(--text-color-secondary);
+}
+
+/* User Profile Badge at bottom of sidebar */
+.user-profile-bottom {
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.user-badge {
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 12px;
+  border-radius: 12px;
+  overflow: hidden; /* Ensure it doesn't break out of the sidebar */
+}
+.user-badge-avatar {
+  background-color: var(--primary-color);
+  color: #000;
+  font-weight: bold;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.user-badge-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.user-badge-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.user-badge-email {
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.main-content {
+  padding: 24px 48px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .sidenav {
+    width: 100vw !important;
+  }
+  
+  .main-content {
+    padding: 16px;
+  }
+}

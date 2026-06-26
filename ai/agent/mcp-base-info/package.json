@@ -1,0 +1,13 @@
+{
+  "name": "medianet-base-mcp",
+  "version": "1.0.0",
+  "description": "MCP Server to consult base information and requirements for Medianet Technical Test",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.1"
+  }
+}

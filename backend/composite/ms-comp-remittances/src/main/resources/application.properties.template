@@ -1,0 +1,29 @@
+# Copy this file to application.properties and replace CHANGE_ME placeholders with real values.
+# Do not commit the real file (see .gitignore).
+
+spring.application.name=ms-comp-remittances
+server.port=8080
+
+# gRPC clients configuration
+grpc.client.client-service.address=static://localhost:9091
+grpc.client.client-service.negotiation-type=plaintext
+
+grpc.client.account-service.address=static://localhost:9093
+grpc.client.account-service.negotiation-type=plaintext
+
+grpc.client.movement-service.address=static://localhost:9093
+grpc.client.movement-service.negotiation-type=plaintext
+
+# CORS Configuration
+cors.allowed-origins=http://localhost:4200
+cors.allowed-methods=GET,POST,PUT,DELETE,OPTIONS,PATCH
+cors.allowed-headers=Authorization,Cache-Control,Content-Type
+cors.allow-credentials=true
+
+# Force Reactive (WebFlux) mode to avoid Servlet mode from inherited spring-boot-starter-web
+spring.main.web-application-type=reactive
+# Kafka properties
+spring.kafka.bootstrap-servers=localhost:9092
+
+# Admin Config
+app.admin.identification=1311322422

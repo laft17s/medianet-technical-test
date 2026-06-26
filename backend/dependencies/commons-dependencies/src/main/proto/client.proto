@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package com.laft.client.grpc;
+
+option java_multiple_files = true;
+option java_package = "com.laft.commons.grpc.client";
+
+service ClientServiceGrpc {
+    rpc CreateClient (ClientRequest) returns (ClientResponse);
+    rpc GetClient (GetClientRequest) returns (ClientResponse);
+    rpc UpdateClient (ClientRequest) returns (ClientResponse);
+    rpc DeleteClient (DeleteClientRequest) returns (DeleteClientResponse);
+    rpc GetAllClients (EmptyRequest) returns (ClientListResponse);
+    rpc ValidateCredentials (AuthRequest) returns (ClientResponse);
+    rpc PatchClientStatus (PatchClientStatusRequest) returns (ClientResponse);
+}
+
+message ClientRequest {
+    int64 clientId = 1;
+    string name = 2;
+    string gender = 3;
+    int32 age = 4;
+    string identification = 5;
+    string address = 6;
+    string phone = 7;
+    string password = 8;
+    bool status = 9;
+}
+
+message ClientResponse {
+    int64 clientId = 1;
+    string name = 2;
+    string gender = 3;
+    int32 age = 4;
+    string identification = 5;
+    string address = 6;
+    string phone = 7;
+    bool status = 8;
+}
+
+message GetClientRequest {
+    int64 clientId = 1;
+}
+
+message PatchClientStatusRequest {
+    int64 clientId = 1;
+    bool status = 2;
+}
+
+message DeleteClientRequest {
+    int64 clientId = 1;
+}
+
+message DeleteClientResponse {
+    bool success = 1;
+}
+
+message ClientListResponse {
+    repeated ClientResponse clients = 1;
+}
+
+message EmptyRequest {}
+message AuthRequest {
+    string identification = 1;
+    string password = 2;
+}
+

@@ -1,0 +1,42 @@
+<div class="login-page">
+  <div class="glass-card">
+    <div class="header">
+      <h2>Remittances App</h2>
+      <p>Bienvenido. Por favor inicia sesión.</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+
+      <div *ngIf="error" class="error-msg">{{error}}</div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Identificación (Cédula)</mat-label>
+        <input matInput formControlName="identification" required>
+        <mat-error *ngIf="f['identification'].hasError('required')">
+          La identificación es requerida
+        </mat-error>
+        <mat-error
+          *ngIf="f['identification'].hasError('invalidEcuadorianId') && !f['identification'].hasError('required')">
+          Cédula ecuatoriana inválida
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Contraseña</mat-label>
+        <input matInput formControlName="password" type="password" required>
+        <mat-error *ngIf="f['password'].hasError('required')">
+          La contraseña es requerida
+        </mat-error>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" type="submit" class="full-width login-btn"
+        [disabled]="loginForm.invalid">
+        INICIAR SESIÓN
+      </button>
+    </form>
+
+    <div class="hints">
+      <small>¿No tienes cuenta? <a routerLink="/auth/register" class="register-link">Regístrate aquí</a></small>
+    </div>
+  </div>
+</div>
